@@ -19,8 +19,9 @@ runs:
     - name: Register debian.fhem repository
       if: inputs.mode == 'debian'
       run: |
-        wget -O /etc/apt/keyrings/deb.fhem.key https://debian.fhem.de/archive.key 
-        echo "deb [signed-by=/etc/apt/keyrings/deb.fhem.key] deb https://debian.fhem.de/nightly/ /" >>  /etc/apt/sources.list
+        sudo wget -O /etc/apt/keyrings/deb.fhem.key https://debian.fhem.de/archive.key 
+        sudo touch /etc/apt/sources.list.d/deb.fhem.list
+        echo 'deb [signed-by=/etc/apt/keyrings/deb.fhem.key] https://debian.fhem.de/nightly/ /' | sudo tee -a /etc/apt/sources.list.d/deb.fhem.list
       shell: bash
 
     - name: Install latest deb package
