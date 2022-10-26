@@ -12,6 +12,7 @@ inputs:
     description: Let the default service run or stop it?
     required: false
     default: false
+    type: boolean
   
 runs:
   using: "composite"
@@ -32,7 +33,7 @@ runs:
       shell: bash
       
     - name: stop service fhem
-      if: inputs.runservice == false
+      if: inputs.runservice == 'false'
       run: |
         sudo systemctl stop fhem
       shell: bash
