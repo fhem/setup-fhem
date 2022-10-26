@@ -1,0 +1,20 @@
+name: Test-Action
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout branch
+      - uses: actions/checkout@v3
+
+      - uses: ./
+      - name: Run this action
