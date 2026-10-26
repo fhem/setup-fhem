@@ -21,3 +21,14 @@ jobs:
 
       - uses: ./
         name: Run this action
+
+      - name: Verify fhem is installed and stopped
+        run: |
+          dpkg -s fhem | grep -E '^(Status|Version):'
+          for i in $(seq 10); do
+            pgrep -u fhem -f fhem.pl > /dev/null || exit 0
+            sleep 1
+          done
+          pgrep -u fhem -af fhem.pl
+          echo "fhem is still running"
+          exit 1
