@@ -9,7 +9,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-24.04, ubuntu-26.04 ]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: checkout branch
@@ -17,3 +21,14 @@ jobs:
 
       - uses: ./
         name: Run this action
+
+      - name: Verify fhem is installed and stopped
+        run: |
+          dpkg -s fhem | grep -E '^(Status|Version):'
+          for i in $(seq 10); do
+            pgrep -u fhem -f fhem.pl > /dev/null || exit 0
+            sleep 1
+          done
+          pgrep -u fhem -af fhem.pl
+          echo "fhem is still running"
+          exit 1

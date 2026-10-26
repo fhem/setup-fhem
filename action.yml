@@ -20,9 +20,10 @@ runs:
     - name: Register debian.fhem repository
       if: inputs.mode == 'debian'
       run: |
-        sudo wget -O /etc/apt/keyrings/deb.fhem.key https://debian.fhem.de/archive.key 
+        # archive.key is ASCII-armored; apt >= 3 only accepts armored keyrings with the .asc extension
+        sudo wget -O /etc/apt/keyrings/deb.fhem.asc https://debian.fhem.de/archive.key
         sudo touch /etc/apt/sources.list.d/deb.fhem.list
-        echo 'deb [signed-by=/etc/apt/keyrings/deb.fhem.key] https://debian.fhem.de/nightly/ /' | sudo tee -a /etc/apt/sources.list.d/deb.fhem.list
+        echo 'deb [signed-by=/etc/apt/keyrings/deb.fhem.asc] https://debian.fhem.de/nightly/ /' | sudo tee -a /etc/apt/sources.list.d/deb.fhem.list
       shell: bash
 
     - name: Install latest deb package
@@ -36,4 +37,9 @@ runs:
       if: inputs.runservice == 'false'
       run: |
         sudo systemctl stop fhem
+        # the package may install a SysV init script instead of fhem.service (e.g. on Ubuntu 26.04),
+        # then systemctl stop does not end the running process
+        if [ -x /etc/init.d/fhem ] && pgrep -u fhem -f fhem.pl > /dev/null; then
+          sudo /etc/init.d/fhem stop noaptmark
+        fi
       shell: bash
